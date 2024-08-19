@@ -12,7 +12,7 @@ def get_weather_forecast(
    # Must match the name of the parameters in your tool definition
    latitude: float, 
    longitude: float) -> str:
-   
+  
     url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=temperature_2m&forecast_days=1"
     
     response = requests.get(url)
@@ -27,17 +27,17 @@ my_local_tools = [
         "type": "function",
         "function": {
             "name": "get_current_weather",
-            "description": "Retrieves the current weather for the location you specify.",
+            "description": "Retrieves the current weather for the latitude and longitude belonging to a place you know. When you specify the latitude and longitude, IT IS CRUCIAL THAT YOU DO NOT SPECIFY ANYTHING ELSE. Before you use this tool, ensure that you only send the latitude and longitude of the place you know. If you are sending any other information, think again and remove any information that is not latitude and longitude.",
             "parameters": {
               "type": "object",
               "properties": {
                   "latitude": {
                       "type": "number",
-                      "description": "The latitude of the location.",
+                      "description": "The latitude of the place you know.",
                   },
                   "longitude": {
                       "type": "number",
-                      "description": "The longitude of the location.",
+                      "description": "The longitude of the place you know.",
                   },
               },
               "required": [
@@ -65,19 +65,19 @@ response = client.chat.completions.create(
   model=MODEL,
   messages=messages,
   # Passes Code Execution as a tool
-  tools=th.get_tools()+my_local_tools,
+  tools=th.get_tools() + my_local_tools,
 )
 
 # Runs the Code Execution tool, gets the result, 
 # and appends it to the context
 tool_run = th.run_tools(response)
 messages = messages + tool_run
-print(messages[1])
+print(messages)
 
 response = client.chat.completions.create(
   model=MODEL,
   messages=messages,
-  tools=th.get_tools(),
+  tools=th.get_tools() + my_local_tools,
 )
 
 print(response.choices[0].message.content)
